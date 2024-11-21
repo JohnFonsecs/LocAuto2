@@ -48,26 +48,34 @@ namespace Locacoes.Controllers
         // GET: Locacao/Create
         public IActionResult Create()
         {
-            ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Id");
+            ViewBag.ClienteId = new SelectList(_context.Clientes, "Id", "Nome");
+            ViewBag.Veiculos = _context.Veiculo.Select(v => new { v.Id, Nome = v.Modelo.Nome }).ToList();
             return View();
         }
 
-        // POST: Locacao/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,DataLocacao,ValorTotal,ClienteId")] Locacao locacao)
+        public IActionResult Create(Locacao locacao, string veiculosLocados)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(locacao);
-                await _context.SaveChangesAsync();
+                // Processa os veículos locados
+                var veiculoIds = veiculosLocados?.Split(',').Select(int.Parse).ToList() ?? new List<int>();
+                locacao.VeiculosLocados = locacao.VeiculosLocados ?? new List<VeiculoLocado>();
+                foreach (var veiculoId in veiculoIds)
+                {
+                    locacao.VeiculosLocados.Add(new VeiculoLocado { VeiculoId = veiculoId });
+                }
+
+                _context.Locacoes.Add(locacao);
+                _context.SaveChanges();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Id", locacao.ClienteId);
+
+            ViewBag.ClienteId = new SelectList(_context.Clientes, "Id", "Nome", locacao.ClienteId);
+            ViewBag.Veiculos = _context.Veiculo.Select(v => new { v.Id, Nome = v.Modelo.Nome }).ToList();
             return View(locacao);
         }
+
 
         // GET: Locacao/Edit/5
         public async Task<IActionResult> Edit(int? id)

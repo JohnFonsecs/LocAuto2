@@ -10,23 +10,51 @@
 <h4>Locacao</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-6">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
             <div class="form-group">
                 <label asp-for="DataLocacao" class="control-label"></label>
-                <input asp-for="DataLocacao" class="form-control" />
+                <input asp-for="DataLocacao" type="date" class="form-control" />
                 <span asp-validation-for="DataLocacao" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="ValorTotal" class="control-label"></label>
                 <input asp-for="ValorTotal" class="form-control" />
                 <span asp-validation-for="ValorTotal" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="ClienteId" class="control-label"></label>
-                <select asp-for="ClienteId" class ="form-control" asp-items="ViewBag.ClienteId"></select>
+                <select asp-for="ClienteId" class="form-control" asp-items="ViewBag.ClienteId"></select>
             </div>
+
+            <!-- Área para adicionar Veículos -->
+            <div class="form-group">
+                <label for="veiculoDropdown">Veículo</label>
+                <div class="input-group">
+                    <select id="veiculoDropdown" class="form-control">
+                        <option value="">Selecione um veículo</option>
+                        @foreach (var veiculo in ViewBag.Veiculos)
+                        {
+                            <option value="@veiculo.Id">@veiculo.Nome</option>
+                        }
+                    </select>
+                    <button type="button" id="addVeiculoBtn" class="btn btn-success">+</button>
+                </div>
+            </div>
+
+            <!-- Lista de Veículos Locados -->
+            <div class="form-group">
+                <label for="veiculosLocadosList">Veículos Locados</label>
+                <ul id="veiculosLocadosList" class="list-group"></ul>
+            </div>
+
+            <!-- Campo oculto para armazenar os IDs dos veículos locados -->
+            <input type="hidden" id="veiculosLocados" name="VeiculosLocados" />
+
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
@@ -39,5 +67,44 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        const veiculoDropdown = document.getElementById('veiculoDropdown');
+        const addVeiculoBtn = document.getElementById('addVeiculoBtn');
+        const veiculosLocadosList = document.getElementById('veiculosLocadosList');
+        const veiculosLocadosInput = document.getElementById('veiculosLocados');
+
+        let veiculosLocados = [];
+
+        // Adicionar veículo à lista
+        addVeiculoBtn.addEventListener('click', () => {
+            const veiculoId = veiculoDropdown.value;
+            const veiculoText = veiculoDropdown.options[veiculoDropdown.selectedIndex].text;
+
+            if (!veiculoId || veiculosLocados.includes(veiculoId)) {
+                alert('Selecione um veículo válido que ainda não foi adicionado.');
+                return;
+            }
+
+            // Adicionar à lista visual
+            const li = document.createElement('li');
+            li.className = 'list-group-item d-flex justify-content-between align-items-center';
+            li.innerText = veiculoText;
+
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'btn btn-danger btn-sm';
+            removeBtn.innerText = '-';
+            removeBtn.onclick = () => {
+                veiculosLocadosList.removeChild(li);
+                veiculosLocados = veiculosLocados.filter(id => id !== veiculoId);
+                veiculosLocadosInput.value = veiculosLocados.join(',');
+            };
+
+            li.appendChild(removeBtn);
+            veiculosLocadosList.appendChild(li);
+
+            // Adicionar ao array
+            veiculosLocados.push(veiculoId);
+            veiculosLocadosInput.value = veiculosLocados.join(',');
+        });
+    </script>
 }

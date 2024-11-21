@@ -16,8 +16,19 @@ namespace Locacoes.Data
         public DbSet<VeiculoLocado> VeiculosLocados { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Configuração para VeiculoLocado
             modelBuilder.Entity<VeiculoLocado>()
-                .HasKey(vl => new { vl.LocacaoId, vl.VeiculoId });
+                .HasKey(v => v.Id); // Configura Id como chave primária.
+
+            modelBuilder.Entity<VeiculoLocado>()
+                .HasOne(v => v.Locacao)
+                .WithMany(l => l.VeiculosLocados)
+                .HasForeignKey(v => v.LocacaoId);
+
+            modelBuilder.Entity<VeiculoLocado>()
+                .HasOne(v => v.Veiculo)
+                .WithMany(v => v.VeiculosLocados)
+                .HasForeignKey(v => v.VeiculoId);
         }
     }
 }

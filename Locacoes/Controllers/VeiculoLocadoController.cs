@@ -37,7 +37,7 @@ namespace Locacoes.Controllers
             var veiculoLocado = await _context.VeiculosLocados
                 .Include(v => v.Locacao)
                 .Include(v => v.Veiculo)
-                .FirstOrDefaultAsync(m => m.LocacaoId == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (veiculoLocado == null)
             {
                 return NotFound();
@@ -59,7 +59,7 @@ namespace Locacoes.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("VeiculoId,LocacaoId,DataDevolucao,KilometragemInicial,KilometragemFinal,ValorDiaria")] VeiculoLocado veiculoLocado)
+        public async Task<IActionResult> Create([Bind("Id,VeiculoId,LocacaoId,DataDevolucao,KilometragemInicial,KilometragemFinal,ValorDiaria")] VeiculoLocado veiculoLocado)
         {
             if (ModelState.IsValid)
             {
@@ -95,9 +95,9 @@ namespace Locacoes.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("VeiculoId,LocacaoId,DataDevolucao,KilometragemInicial,KilometragemFinal,ValorDiaria")] VeiculoLocado veiculoLocado)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,VeiculoId,LocacaoId,DataDevolucao,KilometragemInicial,KilometragemFinal,ValorDiaria")] VeiculoLocado veiculoLocado)
         {
-            if (id != veiculoLocado.LocacaoId)
+            if (id != veiculoLocado.Id)
             {
                 return NotFound();
             }
@@ -111,7 +111,7 @@ namespace Locacoes.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!VeiculoLocadoExists(veiculoLocado.LocacaoId))
+                    if (!VeiculoLocadoExists(veiculoLocado.Id))
                     {
                         return NotFound();
                     }
@@ -138,7 +138,7 @@ namespace Locacoes.Controllers
             var veiculoLocado = await _context.VeiculosLocados
                 .Include(v => v.Locacao)
                 .Include(v => v.Veiculo)
-                .FirstOrDefaultAsync(m => m.LocacaoId == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (veiculoLocado == null)
             {
                 return NotFound();
@@ -164,7 +164,7 @@ namespace Locacoes.Controllers
 
         private bool VeiculoLocadoExists(int id)
         {
-            return _context.VeiculosLocados.Any(e => e.LocacaoId == id);
+            return _context.VeiculosLocados.Any(e => e.Id == id);
         }
     }
 }
